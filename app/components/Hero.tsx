@@ -42,7 +42,7 @@ export default function Hero() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://portfolio-api-55m6.onrender.com/api';
         const response = await axios.get(`${apiUrl}/profile`);
         console.log('PROFILE:', response.data);
         setProfile(response.data);
