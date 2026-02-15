@@ -31,10 +31,15 @@ export default function BlogDetailPage() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://portfolio-api-55m6.onrender.com/api';
+        
+        console.log('📡 Fetching post from:', `${apiUrl}/blog/${slug}`);
+        
+        const response = await axios.get(`${apiUrl}/blog/${slug}`);
+        console.log('✅ Post fetched:', response.data);
         setPost(response.data);
       } catch (error) {
-        console.error('Error fetching post:', error);
+        console.error('❌ Error fetching post:', error);
       } finally {
         setLoading(false);
       }
@@ -61,6 +66,7 @@ export default function BlogDetailPage() {
         <Navbar />
         <div className="text-center py-40">
           <p className="text-gray-400 text-lg">Article not found</p>
+          <p className="text-gray-500 text-sm mt-2">Make sure the post exists and is published</p>
         </div>
         <Footer />
       </>
