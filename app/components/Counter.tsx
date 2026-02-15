@@ -1,58 +1,55 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { useEffect, useRef, useState } from 'react';
 
-export default function Counter({ end, duration = 2, label }) {
-  const countRef = useRef(0);
-  const nodeRef = useRef(null);
+interface CounterProps {
+  end: number;
+  duration?: number;
+  label?: string;
+}
+
+export default function Counter({ end, duration = 2, label = '' }: CounterProps) {
+  const [count, setCount] = useState(0);
   const { ref, inView } = useInView({
     threshold: 0.5,
-    triggerOnce: false, // CHANGED: Allow re-triggering
+    triggerOnce: true,
   });
+  const hasStarted = useRef(false);
 
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || hasStarted.current) return;
 
-    const targetNumber = parseInt(end);
-    countRef.current = 0; // ADDED: Reset counter on update
-    const increment = targetNumber / (duration * 60); // 60 frames per second
+    hasStarted.current = true;
+    let startTime: number;
+    let animationId: number;
 
-    const updateCount = () => {
-      countRef.current += increment;
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime;
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / (duration * 1000), 1);
+      const currentCount = Math.floor(progress * end);
 
-      if (countRef.current >= targetNumber) {
-        countRef.current = targetNumber;
-        if (nodeRef.current) {
-          nodeRef.current.textContent = targetNumber + (typeof end === 'string' && end.includes('+') ? '+' : '');
-        }
-      } else {
-        if (nodeRef.current) {
-          nodeRef.current.textContent = Math.floor(countRef.current) + (typeof end === 'string' && end.includes('+') ? '+' : '');
-        }
-        requestAnimationFrame(updateCount);
+      setCount(currentCount);
+
+      if (progress < 1) {
+        animationId = requestAnimationFrame(animate);
       }
     };
 
-    requestAnimationFrame(updateCount);
+    animationId = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
   }, [inView, end, duration]);
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
-      transition={{ duration: 0.6 }}
-      className="text-center"
-    >
-      <h3
-        ref={nodeRef}
-        className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2"
-      >
-        0
-      </h3>
-      <p className="text-gray-400 text-lg">{label}</p>
-    </motion.div>
+    <div ref={ref} className="text-center">
+      <div className="text-4xl font-bold text-blue-400 mb-2">{count.toLocaleString()}+</div>
+      <p className="text-gray-400">{label}</p>
+    </div>
   );
 }
