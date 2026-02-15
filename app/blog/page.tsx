@@ -8,7 +8,26 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Calendar, ArrowRight, Loader, Search } from 'lucide-react';
 
-function BlogCard({ post, index }) {
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt?: string;
+  featured_image?: string;
+  tags?: string[];
+  author?: string;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface BlogCardProps {
+  post: BlogPost;
+  index: number;
+}
+
+function BlogCard({ post, index }: BlogCardProps) {
   const { ref, inView } = useInView({
     threshold: 0.2,
     triggerOnce: true,
@@ -105,10 +124,10 @@ function BlogCard({ post, index }) {
 }
 
 export default function BlogPage() {
-  const [posts, setPosts] = useState([]);
-  const [filteredPosts, setFilteredPosts] = useState([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch blog posts from API
@@ -116,7 +135,7 @@ export default function BlogPage() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/blog');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`);
         if (!response.ok) throw new Error('Failed to fetch posts');
         const data = await response.json();
         setPosts(data);
