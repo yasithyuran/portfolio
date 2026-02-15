@@ -6,9 +6,9 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Github, ExternalLink, Loader } from 'lucide-react';
+import { Github, ExternalLink, Loader, Pin } from 'lucide-react';
 
-function ProjectCard({ project, index }) {
+function ProjectCard({ project, index, isPinned = false }) {
   const { ref, inView } = useInView({
     threshold: 0.2,
     triggerOnce: true,
@@ -21,8 +21,16 @@ function ProjectCard({ project, index }) {
       animate={inView ? { opacity: 1, scale: 1, rotateY: 0 } : { opacity: 0, scale: 0.8, rotateY: 20 }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
       whileHover={{ scale: 1.05, translateY: -10 }}
-      className="bg-black rounded-lg overflow-hidden border border-gray-800 hover:border-blue-500 transition h-full flex flex-col cursor-pointer"
+      className="bg-black rounded-lg overflow-hidden border border-gray-800 hover:border-blue-500 transition h-full flex flex-col cursor-pointer relative"
     >
+      {/* Pinned Badge */}
+      {isPinned && (
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1 px-3 py-1 bg-blue-500/90 text-white rounded-full text-xs font-semibold">
+          <Pin size={14} fill="currentColor" />
+          Pinned
+        </div>
+      )}
+
       {/* Image with Thumbnail */}
       <motion.div
         className="w-full h-56 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center overflow-hidden relative"
@@ -155,12 +163,22 @@ export default function ProjectsPage() {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://portfolio-api-55m6.onrender.com/api/projects');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://portfolio-api-55m6.onrender.com/api';
+        const response = await fetch(`${apiUrl}/projects`);
         if (!response.ok) throw new Error('Failed to fetch projects');
         const data = await response.json();
-        setProjects(data);
-        setFilteredProjects(data);
+        
+        // Sort: pinned first, then by date
+        const sorted = data.sort((a, b) => {
+          if (a.pinned && !b.pinned) return -1;
+          if (!a.pinned && b.pinned) return 1;
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        
+        setProjects(sorted);
+        setFilteredProjects(sorted);
         setError(null);
+        console.log('✅ Projects loaded:', sorted);
       } catch (err) {
         console.error('Error fetching projects:', err);
         setError('Failed to load projects. Make sure backend is running.');
@@ -174,14 +192,29 @@ export default function ProjectsPage() {
     fetchProjects();
   }, []);
 
-  // Filter projects by category
+  // Filter projects by category (keeping pinned at top)
   useEffect(() => {
+    let filtered;
+    
     if (selectedCategory === 'All') {
-      setFilteredProjects(projects);
+      filtered = projects;
     } else {
-      setFilteredProjects(projects.filter((p) => p.category === selectedCategory));
+      filtered = projects.filter((p) => p.category === selectedCategory);
     }
+    
+    // Sort: pinned first
+    const sorted = filtered.sort((a, b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return 0;
+    });
+    
+    setFilteredProjects(sorted);
   }, [selectedCategory, projects]);
+
+  // Separate pinned and regular projects for display
+  const pinnedProjects = filteredProjects.filter(p => p.pinned);
+  const regularProjects = filteredProjects.filter(p => !p.pinned);
 
   return (
     <>
@@ -249,18 +282,58 @@ export default function ProjectsPage() {
                 <p className="text-gray-500 text-sm">Check back soon!</p>
               </motion.div>
             ) : (
-              <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6 }}
-              >
-                {filteredProjects.map((project, index) => (
-                  <Link key={project._id} href={`/projects/${project._id}`} className="block">
-                    <ProjectCard project={project} index={index} />
-                  </Link>
-                ))}
-              </motion.div>
+              <>
+                {/* Pinned Projects Section */}
+                {pinnedProjects.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-16"
+                  >
+                    <div className="flex items-center gap-2 mb-8">
+                      <Pin size={24} className="text-blue-400" fill="currentColor" />
+                      <h2 className="text-2xl font-bold text-white">Pinned Projects</h2>
+                    </div>
+                    <motion.div
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      {pinnedProjects.map((project, index) => (
+                        <Link key={project._id} href={`/projects/${project._id}`} className="block">
+                          <ProjectCard project={project} index={index} isPinned={true} />
+                        </Link>
+                      ))}
+                    </motion.div>
+                  </motion.div>
+                )}
+
+                {/* Regular Projects Section */}
+                {regularProjects.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    {pinnedProjects.length > 0 && (
+                      <h2 className="text-2xl font-bold text-white mb-8">Other Projects</h2>
+                    )}
+                    <motion.div
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      {regularProjects.map((project, index) => (
+                        <Link key={project._id} href={`/projects/${project._id}`} className="block">
+                          <ProjectCard project={project} index={index} isPinned={false} />
+                        </Link>
+                      ))}
+                    </motion.div>
+                  </motion.div>
+                )}
+              </>
             )}
           </div>
         </div>
