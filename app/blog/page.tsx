@@ -50,7 +50,7 @@ function BlogCard({ post, index }: BlogCardProps) {
       whileHover={{ translateY: -5 }}
       className="bg-black rounded-lg border border-gray-800 hover:border-blue-500 transition overflow-hidden h-full flex flex-col cursor-pointer"
     >
-      {/* Featured Image - LARGER */}
+      {/* Featured Image */}
       <motion.div
         className="w-full h-72 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center overflow-hidden relative"
         whileHover={{ scale: 1.05 }}
@@ -100,12 +100,12 @@ function BlogCard({ post, index }: BlogCardProps) {
           <span>{readingTime} min read</span>
         </div>
 
-        {/* Excerpt - LARGER */}
+        {/* Excerpt */}
         <p className="text-gray-400 text-sm mb-8 line-clamp-4 flex-grow">
           {post.excerpt || post.content?.substring(0, 150) || 'Post content will appear here'}
         </p>
 
-        {/* Read More Link - BIGGER & MORE PROMINENT */}
+        {/* Read More Link */}
         <motion.div
           whileHover={{ x: 5 }}
           className="mt-auto"
@@ -130,20 +130,38 @@ export default function BlogPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch blog posts from API
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`);
-        if (!response.ok) throw new Error('Failed to fetch posts');
+        setError(null);
+
+        // Get API URL from environment or use production URL
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://portfolio-api-55m6.onrender.com/api';
+        
+        console.log('📡 Fetching from:', `${apiUrl}/blog`);
+
+        const response = await fetch(`${apiUrl}/blog`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
+        console.log('✅ Posts fetched:', data);
+
         setPosts(data);
         setFilteredPosts(data);
-        setError(null);
       } catch (err) {
-        console.error('Error fetching posts:', err);
-        setError('Failed to load blog posts. Make sure backend is running.');
+        console.error('❌ Error fetching posts:', err);
+        setError(`Failed to load blog posts: ${err instanceof Error ? err.message : 'Unknown error'}`);
         setPosts([]);
         setFilteredPosts([]);
       } finally {
@@ -154,7 +172,6 @@ export default function BlogPage() {
     fetchPosts();
   }, []);
 
-  // Filter posts by search query
   useEffect(() => {
     const filtered = posts.filter((post) =>
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -230,8 +247,8 @@ export default function BlogPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6 }}
             >
-              <p className="text-gray-400 mb-4">{error}</p>
-              <p className="text-gray-500 text-sm">No articles yet. Check back soon!</p>
+              <p className="text-red-400 mb-4">⚠️ {error}</p>
+              <p className="text-gray-500 text-sm">Check backend at: https://portfolio-api-55m6.onrender.com/api/blog</p>
             </motion.div>
           ) : filteredPosts.length === 0 ? (
             <motion.div
