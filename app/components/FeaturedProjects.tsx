@@ -7,7 +7,20 @@ import { ArrowRight } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import Link from 'next/link';
 
-function ProjectCard({ project, index }) {
+interface Project {
+  _id: string;
+  title: string;
+  description: string;
+  thumbnail?: string;
+  technologies?: string[];
+}
+
+interface ProjectCardProps {
+  project: Project;
+  index: number;
+}
+
+function ProjectCard({ project, index }: ProjectCardProps) {
   const { ref, inView } = useInView({
     threshold: 0.2,
     triggerOnce: true,
@@ -80,13 +93,14 @@ function ProjectCard({ project, index }) {
 }
 
 export default function FeaturedProjects() {
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFeaturedProjects = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/projects/featured');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        const response = await axios.get(`${apiUrl}/projects/featured`);
         setProjects(response.data);
         console.log('✅ Featured projects loaded:', response.data);
       } catch (error) {

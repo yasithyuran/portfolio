@@ -6,6 +6,13 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+interface ProfileData {
+  heroImage?: string;
+  name?: string;
+  title?: string;
+  description?: string;
+}
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -30,16 +37,14 @@ const itemVariants = {
 };
 
 export default function Hero() {
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const apiUrl =
-          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
         const response = await axios.get(`${apiUrl}/profile`);
-        console.log("PROFILE:", response.data);
+        console.log('PROFILE:', response.data);
         setProfile(response.data);
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -80,7 +85,6 @@ export default function Hero() {
       >
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
 
-
           {/* LEFT COLUMN */}
           <motion.div className="flex flex-col justify-center lg:col-span-2">
 
@@ -113,7 +117,7 @@ export default function Hero() {
               variants={itemVariants}
               className="text-gray-400 text-lg mb-8"
             >
-             Passionate about building visually compelling and high-performing digital experiences. I combine clean code with thoughtful design to create modern, user-friendly websites and applications. From frontend development to backend systems and graphic design, I enjoy turning ideas into impactful digital solutions.
+              Passionate about building visually compelling and high-performing digital experiences. I combine clean code with thoughtful design to create modern, user-friendly websites and applications. From frontend development to backend systems and graphic design, I enjoy turning ideas into impactful digital solutions.
             </motion.p>
 
             <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-4">
@@ -136,9 +140,9 @@ export default function Hero() {
 
           {/* RIGHT COLUMN (ALWAYS RENDERS) */}
           <motion.div
-  variants={itemVariants}
-  className="relative flex justify-center items-center lg:col-span-3"
->
+            variants={itemVariants}
+            className="relative flex justify-center items-center lg:col-span-3"
+          >
 
             {profile && profile.heroImage ? (
               <motion.div

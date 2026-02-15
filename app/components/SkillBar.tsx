@@ -3,7 +3,12 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
-export default function SkillBar({ skill, percentage }) {
+interface SkillBarProps {
+  skill: string;
+  percentage: number;
+}
+
+export default function SkillBar({ skill, percentage }: SkillBarProps) {
   const { ref, inView } = useInView({
     threshold: 0.5,
     triggerOnce: true,
