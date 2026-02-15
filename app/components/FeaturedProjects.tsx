@@ -99,7 +99,7 @@ export default function FeaturedProjects() {
   useEffect(() => {
     const fetchFeaturedProjects = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://https://portfolio-api-55m6.onrender.com/api/api';
         const response = await axios.get(`${apiUrl}/projects/featured`);
         setProjects(response.data);
         console.log('✅ Featured projects loaded:', response.data);

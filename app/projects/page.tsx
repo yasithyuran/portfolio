@@ -155,7 +155,7 @@ export default function ProjectsPage() {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/projects');
+        const response = await fetch('http://https://portfolio-api-55m6.onrender.com/api/api/projects');
         if (!response.ok) throw new Error('Failed to fetch projects');
         const data = await response.json();
         setProjects(data);

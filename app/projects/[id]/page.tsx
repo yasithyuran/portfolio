@@ -18,7 +18,7 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/projects/${projectId}`);
+        const response = await axios.get(`http://https://portfolio-api-55m6.onrender.com/api/api/projects/${projectId}`);
         setProject(response.data);
       } catch (error) {
         console.error('Error fetching project:', error);
