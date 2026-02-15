@@ -8,16 +8,30 @@ import Footer from '../../components/Footer';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Loader } from 'lucide-react';
 
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt?: string;
+  featured_image?: string;
+  tags?: string[];
+  author?: string;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function BlogDetailPage() {
   const params = useParams();
-  const slug = params.slug;
-  const [post, setPost] = useState(null);
+  const slug = params.slug as string;
+  const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/blog/${slug}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`);
         setPost(response.data);
       } catch (error) {
         console.error('Error fetching post:', error);
