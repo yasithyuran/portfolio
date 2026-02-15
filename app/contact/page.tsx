@@ -42,7 +42,7 @@ export default function ContactPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('http://https://portfolio-api-55m6.onrender.com/api/api/contact', {
+      const response = await fetch('https://portfolio-api-55m6.onrender.com/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

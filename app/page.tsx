@@ -95,7 +95,7 @@ export default function Home() {
     const fetchData = async () => {
       try {
         // Fetch profile with all data including techStack
-        const profileRes = await axios.get('http://https://portfolio-api-55m6.onrender.com/api/api/profile');
+        const profileRes = await axios.get('https://portfolio-api-55m6.onrender.com/api/profile');
         setProfile(profileRes.data);
         
         // Get techStack from API response
