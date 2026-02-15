@@ -1,10 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { Github, Linkedin, Mail, Twitter } from 'lucide-react';
+import { Github, Linkedin, Mail, Instagram } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+
+  // Default social URLs - Update these with your real URLs
+  const socialLinks = {
+    github: 'https://github.com/yasithyuran',
+    linkedin: 'https://linkedin.com/in/yasithyuran',
+    instagram: 'https://instagram.com/yasithyuran',
+    email: 'mailto:your-email@example.com',
+  };
 
   return (
     <footer className="bg-black border-t border-gray-800 mt-20">
@@ -46,20 +54,42 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Social Links - Placeholder */}
+          {/* Social Links */}
           <div>
             <h3 className="text-white font-bold text-lg mb-4">Connect</h3>
             <div className="flex gap-4">
-              <a href="#" className="text-gray-400 hover:text-white transition">
+              <a 
+                href={socialLinks.github} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition"
+                title="GitHub"
+              >
                 <Github size={24} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition">
+              <a 
+                href={socialLinks.linkedin} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition"
+                title="LinkedIn"
+              >
                 <Linkedin size={24} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition">
-                <Twitter size={24} />
+              <a 
+                href={socialLinks.instagram} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition"
+                title="Instagram"
+              >
+                <Instagram size={24} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition">
+              <a 
+                href={socialLinks.email}
+                className="text-gray-400 hover:text-white transition"
+                title="Email"
+              >
                 <Mail size={24} />
               </a>
             </div>
