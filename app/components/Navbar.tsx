@@ -13,8 +13,8 @@ export default function Navbar() {
           <Image
             src="/logo.png"
             alt="Yasith Yuran Logo"
-            width={40}
-            height={40}
+            width={120}
+            height={120}
             className="h-10 w-auto"
             priority
           />
