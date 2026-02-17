@@ -1,101 +1,155 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  color: #fff;
+  overflow-x: hidden;
 }
-/* Add these animations to your globals.css file */
 
-@keyframes blob {
+/* Main dark background */
+body {
+  background-color: #000814;
+}
+
+/* Starfield - Small stars scattered across the sky */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, #fff, rgba(0, 0, 0, 0.2)),
+    radial-gradient(1px 1px at 60px 70px, #fff, rgba(0, 0, 0, 0.2)),
+    radial-gradient(1px 1px at 50px 50px, #fff, rgba(0, 0, 0, 0.2)),
+    radial-gradient(1px 1px at 130px 80px, #eee, rgba(0, 0, 0, 0.2)),
+    radial-gradient(2px 2px at 90px 10px, #fff, rgba(0, 0, 0, 0.2)),
+    radial-gradient(1px 1px at 130px 130px, #fff, rgba(0, 0, 0, 0.2)),
+    radial-gradient(1px 1px at 70px 40px, #fff, rgba(0, 0, 0, 0.2)),
+    radial-gradient(2px 2px at 100px 100px, #fff, rgba(0, 0, 0, 0.2));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  background-attachment: fixed;
+  z-index: -2;
+  pointer-events: none;
+  animation: starTwinkle 5s ease-in-out infinite;
+}
+
+/* Milky Way - Beautiful purple/blue nebula effect */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(
+      ellipse 800px 400px at 50% 20%,
+      rgba(138, 43, 226, 0.2) 0%,
+      rgba(75, 0, 130, 0.12) 20%,
+      rgba(25, 25, 112, 0.08) 40%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 600px 300px at 30% 60%,
+      rgba(65, 105, 225, 0.15) 0%,
+      rgba(25, 25, 112, 0.08) 30%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 700px 350px at 70% 40%,
+      rgba(123, 104, 238, 0.12) 0%,
+      rgba(75, 0, 130, 0.08) 25%,
+      transparent 55%
+    );
+  z-index: -1;
+  pointer-events: none;
+  animation: nebulaPulse 12s ease-in-out infinite;
+}
+
+/* Starfield twinkling animation */
+@keyframes starTwinkle {
   0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
+    opacity: 0.5;
   }
   50% {
-    transform: translateY(-10px);
+    opacity: 1;
   }
 }
 
-.animate-blob {
-  animation: blob 7s infinite;
+/* Nebula pulsing animation */
+@keyframes nebulaPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
-.animate-slide-up {
-  animation: slideUp 0.8s ease-out forwards;
-  opacity: 0;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.8s ease-out;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-.animation-delay-200 {
-  animation-delay: 0.2s;
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.8);
 }
 
-.animation-delay-400 {
-  animation-delay: 0.4s;
+::-webkit-scrollbar-thumb {
+  background: rgba(138, 43, 226, 0.6);
+  border-radius: 5px;
+  border: 2px solid rgba(0, 0, 0, 0.8);
 }
 
-.animation-delay-600 {
-  animation-delay: 0.6s;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(138, 43, 226, 0.8);
 }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
+/* Firefox scrollbar */
+* {
+  scrollbar-color: rgba(138, 43, 226, 0.6) rgba(0, 0, 0, 0.8);
+  scrollbar-width: thin;
 }
 
-.animation-delay-4000 {
-  animation-delay: 4s;
+/* Ensure content is readable on starfield */
+main,
+section,
+div {
+  position: relative;
+  z-index: 1;
+}
+
+/* Optional: Add slight glow to headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+}
+
+/* Smooth transitions */
+a,
+button {
+  transition: all 0.3s ease;
 }
