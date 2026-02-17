@@ -6,7 +6,7 @@ import axios from 'axios';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { motion } from 'framer-motion';
-import { Github, ExternalLink, Loader, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Github, ExternalLink, Loader, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -14,11 +14,13 @@ export default function ProjectDetailPage() {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const response = await axios.get(`https://portfolio-api-55m6.onrender.com/api/projects/${projectId}`);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://portfolio-api-55m6.onrender.com/api';
+        const response = await axios.get(`${apiUrl}/projects/${projectId}`);
         setProject(response.data);
       } catch (error) {
         console.error('Error fetching project:', error);
@@ -39,6 +41,8 @@ export default function ProjectDetailPage() {
         setSelectedImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
       } else if (e.key === 'ArrowRight') {
         setSelectedImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+      } else if (e.key === 'Escape') {
+        setIsLightboxOpen(false);
       }
     };
 
@@ -102,19 +106,31 @@ export default function ProjectDetailPage() {
             className="mb-12 relative"
           >
             {displayImage ? (
-              <div className="relative group">
+              <div className="relative group cursor-pointer" onClick={() => setIsLightboxOpen(true)}>
                 <img
                   src={displayImage}
                   alt={`${project.title} - Image ${selectedImageIndex + 1}`}
-                  className="w-full h-96 md:h-[500px] object-cover rounded-lg border border-gray-800"
+                  className="w-full h-96 md:h-[500px] object-cover rounded-lg border border-gray-800 hover:border-blue-500 transition"
                 />
+
+                {/* Click to expand hint */}
+                <div className="absolute inset-0 rounded-lg bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition">
+                    <p className="text-white text-center text-sm font-semibold bg-black/70 px-4 py-2 rounded-lg">
+                      Click to expand
+                    </p>
+                  </div>
+                </div>
 
                 {/* Navigation Arrows */}
                 {allImages.length > 1 && (
                   <>
                     {/* Left Arrow */}
                     <motion.button
-                      onClick={goToPrevious}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        goToPrevious();
+                      }}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition opacity-0 group-hover:opacity-100"
@@ -125,7 +141,10 @@ export default function ProjectDetailPage() {
 
                     {/* Right Arrow */}
                     <motion.button
-                      onClick={goToNext}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        goToNext();
+                      }}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition opacity-0 group-hover:opacity-100"
@@ -213,6 +232,11 @@ export default function ProjectDetailPage() {
                 ⭐ Featured
               </span>
             )}
+            {project.pinned && (
+              <span className="text-sm bg-blue-900/30 text-blue-300 px-4 py-2 rounded-full border border-blue-800 font-semibold flex items-center gap-1">
+                📌 Pinned
+              </span>
+            )}
           </motion.div>
 
           {/* Description */}
@@ -294,6 +318,78 @@ export default function ProjectDetailPage() {
           </motion.a>
         </div>
       </section>
+
+      {/* Fullscreen Lightbox Modal */}
+      {isLightboxOpen && displayImage && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setIsLightboxOpen(false)}
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+        >
+          {/* Close Button */}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsLightboxOpen(false)}
+            className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition z-10"
+            title="Close (Press Esc)"
+          >
+            <X size={32} />
+          </motion.button>
+
+          {/* Main Image */}
+          <div className="relative max-w-4xl w-full h-auto flex items-center justify-center">
+            <img
+              src={displayImage}
+              alt={`${project.title} - Full Image`}
+              className="max-w-full max-h-[90vh] object-contain rounded-lg"
+            />
+
+            {/* Navigation Arrows in Lightbox */}
+            {allImages.length > 1 && (
+              <>
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToPrevious();
+                  }}
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition"
+                >
+                  <ChevronLeft size={40} />
+                </motion.button>
+
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToNext();
+                  }}
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition"
+                >
+                  <ChevronRight size={40} />
+                </motion.button>
+              </>
+            )}
+          </div>
+
+          {/* Image Counter in Lightbox */}
+          {allImages.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/70 text-white px-6 py-3 rounded-full text-lg font-semibold">
+              {selectedImageIndex + 1} / {allImages.length}
+            </div>
+          )}
+
+          {/* Keyboard Hint */}
+          <div className="absolute bottom-6 right-6 text-white/70 text-sm text-center">
+            <p>← → Arrow Keys • Esc to Close</p>
+          </div>
+        </motion.div>
+      )}
 
       <Footer />
     </>
