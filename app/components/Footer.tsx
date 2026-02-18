@@ -9,9 +9,9 @@ export default function Footer() {
   // Default social URLs - Update these with your real URLs
   const socialLinks = {
     github: 'https://github.com/yasithyuran',
-    linkedin: 'https://linkedin.com/in/yasithyuran',
-    instagram: 'https://instagram.com/yasithyuran',
-    email: 'mailto:your-email@example.com',
+    linkedin: 'https://www.linkedin.com/in/yasith-yuran-1b3a9b2b9/',
+    instagram: 'https://instagram.com/yazithyuran_',
+    email: 'yasithyuran@gmail.com',
   };
 
   return (
